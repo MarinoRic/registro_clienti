@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 export async function getCustomers(req, res) {
   try {
-    const customers = await prisma.clients.findMany({
+    const customers = await prisma.customers.findMany({
       include: { phones: true, addresses: true },
      });
     customers.sort((a, b) => (a.createdAt > b.createdAt) ? 1 : -1)
@@ -18,7 +18,7 @@ export async function getCustomers(req, res) {
 export async function getCustomer(req, res) {
   try {
     const id = parseInt(req.params.id);
-    const customer = await prisma.clients.findUnique({
+    const customer = await prisma.customers.findUnique({
       where: { id },
       include: { phones: true, addresses: true },
     });
@@ -37,11 +37,11 @@ export async function editCustomers(req, res) {
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid client ID' });
 
     // Controlla se l'utente esiste
-    const user = await prisma.clients.findUnique({ where: { id } });
+    const user = await prisma.customers.findUnique({ where: { id } });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     // Aggiorna dati base del cliente
-    const updatedUser = await prisma.clients.update({
+    const updatedUser = await prisma.customers.update({
       where: { id },
       data: {
         name: req.body.name ?? user.name,
@@ -139,7 +139,7 @@ export async function createCustomer(req, res) {
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    const newCustomer = await prisma.clients.create({
+    const newCustomer = await prisma.customers.create({
       data: {
         name,
         email,
@@ -172,14 +172,14 @@ export async function createCustomer(req, res) {
 export async function deleteCustomer(req, res) {
   try {
        const id = parseInt(req.params.id);
-     const customer = await prisma.clients.findUnique({
+     const customer = await prisma.customers.findUnique({
       include: { phones: true, addresses: true },
        where: {id}
      });
 
     if(!customer) return res.status(404).json({ error: 'Customer not found' });
 
-    await prisma.clients.delete({
+    await prisma.customers.delete({
       where: { id },
     });
 
@@ -194,8 +194,8 @@ export async function deleteCustomer(req, res) {
 export async function getCustomerQuotes(req, res) {
   try {
        const id = parseInt(req.params.id);
-     const customer = await prisma.clients.findUnique({
-      include: { quotes: true },
+     const customer = await prisma.customers.findUnique({
+      include: { quotes: true},
        where: {id}
      });
 
